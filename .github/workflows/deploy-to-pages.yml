@@ -6,8 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Rename CV file
-        run: mv cv.pdf index.pdf
+      - name: Rename TeX file
+        run: mv talk.pdf index.pdf
 
       - name: Install pdf2htmlEX
         run: |
