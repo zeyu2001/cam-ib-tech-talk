@@ -13,6 +13,7 @@
 \usepackage{bibentry}
 \usepackage[sort,numbers]{natbib}
 \usepackage{algorithm, algpseudocode}
+\usepackage[overridenote]{pdfpc}
 
 \makeatletter
 \providecommand{\bigsqcap}{%
@@ -82,6 +83,8 @@
 %------------------------------------------------
 
 \begin{frame}{How to find bugs in code?}
+	\note{Shows that 1. you can never trust QA engineers and 2. you can never ancitipate
+		everything that happens in the real world.}
 	\begin{figure}
 		\includegraphics[height=0.8\textheight]{img/1.jpeg}
 	\end{figure}
@@ -140,7 +143,10 @@
 %------------------------------------------------
 
 \begin{frame}{Sign Analysis}
-	As an example, we want to find the possible signs of integer variables and expressions.
+	\note{Complete lattice because every two nodes have converging paths in both directions.}
+
+	As an example, we want to find the possible signs of integer variables and
+	expressions.
 
 	Consider the following abstract values for the sign of an integer:
 
@@ -183,6 +189,9 @@
 %------------------------------------------------
 
 \begin{frame}[fragile]{Sign Analysis}
+	\note{The map lattice is also a complete lattice. Can intuitively see that you can
+		define the partial order by an element-wise comparison of the signs of each variable.}
+
 	Let's create a {\bf map lattice} {\it State = Var $\rightarrow$ Sign} that describes the sign of
 	each variable. Derive a system of equations, one per line, using values from
 	the lattice.
@@ -229,6 +238,9 @@
 %------------------------------------------------
 
 \begin{frame}[fragile]{Sign Analysis}
+	\note{Each abstract state depends on other abstract states, and we can encode these
+		as functions.}
+
 	\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
 
 		\column{.45\textwidth} % Left column and width
@@ -261,6 +273,9 @@
 %------------------------------------------------
 
 \begin{frame}{Monotonicity and Fixed Points}
+	\note{If we combine all the functions into one, we are essentially solving for
+		$x = F(x)$.}
+
 	Generalised equation system over a lattice $L$, with functions $f_i: L^n
 		\rightarrow L$:
 	\begin{align*}
@@ -270,7 +285,7 @@
 		x_n & = f_n(x_1, \ldots, x_n)
 	\end{align*}
 
-	Combine the $n$ functions into $F: L^n \rightarrow L$:
+	Combine the $n$ functions into $F: L^n \rightarrow L^n$:
 	\begin{align*}
 		F(x_1, \ldots, x_n) & = (f_1(x_1, \ldots, x_n), \ldots, f_n(x_1, \ldots, x_n)) \\
 		                    & = (x_1, \ldots, x_n)
@@ -282,6 +297,10 @@
 %------------------------------------------------
 
 \begin{frame}{Monotonicity and Fixed Points}
+	\note{Intuitively, the more we know about the variables at each point, the more we
+		know about the variables at the next point.}
+	\note{We can always find a unique solution to the equation system.}
+
 	\begin{definition}
 		A function $f: L_1 \rightarrow L_2$ is {\bf monotone} if $\forall x, y \in L_1, x \sqsubseteq y \Rightarrow$$ f(x)
 		\sqsubseteq f(y)$
@@ -308,6 +327,8 @@
 %------------------------------------------------
 
 \begin{frame}[fragile]{Computing the Least Fixed Point}
+	\note{Just by definition of fixed points}
+
 	\begin{algorithm}[H]
 		\begin{algorithmic}[1]
 			\Procedure{NaiveFixedPoint}{$F$}
@@ -343,6 +364,8 @@
 %------------------------------------------------
 
 \begin{frame}[fragile]{Control Flow Graph}
+	\note{Nodes represent basic blocks, edges represent control flow.}
+
 	\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
 
 		\column{.45\textwidth} % Left column and width
@@ -360,6 +383,9 @@
 %------------------------------------------------
 
 \begin{frame}[fragile]{Abstract States}
+	\note{Instead of having an abstract state for each line of code like before, we have
+		an abstract state for each node in the CFG.}
+
 	\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
 
 		\column{.45\textwidth} % Left column and width
@@ -402,6 +428,15 @@
 %------------------------------------------------
 
 \begin{frame}[fragile]{Constraint Rules}
+	\note{After $c=b$, we know both $b$ and $c$ are positive, since $b$ is positive in
+		the control flow}
+	\note{After $c=-5$, we know $c$ is negative, but we don't know anything about $b$}
+	\note{So when joining them, we really don't know anything about $b$ or $c$}
+	\note{The sign of $a$ depends on the result of evaluating $c+2$, with the context
+		of the abstract state at that point.}
+	\note{Because we don't know anything about $b$ or $c$, we don't know anything about
+		$a$ either.}
+
 	\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
 
 		\column{.45\textwidth} % Left column and width
@@ -428,6 +463,9 @@
 %------------------------------------------------
 
 \begin{frame}{Solving Data Flow Equations}
+	\note{Same as what we did before, but with the constraint variables representing the
+		abstract states of the CFG nodes.}
+
 	Generalised equation system over a lattice $L$, with functions $f_i: L^n
 		\rightarrow L$:
 	\begin{align*}
@@ -437,7 +475,7 @@
 		[[v_n]] & = f_{v_n}([[v_1]], \ldots, [[v_n]])
 	\end{align*}
 
-	Combine the $n$ functions into $F: L^n \rightarrow L$:
+	Combine the $n$ functions into $F: L^n \rightarrow L^n$:
 	\begin{align*}
 		F([[v_1]], \ldots, [[v_n]]) & = (f_{v_1}([[v_1]], \ldots, [[v_n]]), \ldots, f_{v_n}([[v_1]], \ldots, [[v_n])) \\
 		                            & = ([[v_1]], \ldots, [[v_n]])
