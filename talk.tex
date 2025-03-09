@@ -13,6 +13,7 @@
 \usepackage{bibentry}
 \usepackage[sort,numbers]{natbib}
 \usepackage{algorithm, algpseudocode}
+\usepackage{amssymb}
 \usepackage[overridenote]{pdfpc}
 
 \makeatletter
@@ -584,12 +585,32 @@
 \end{frame}
 
 %----------------------------------------------------------------------------------------
-\begin{frame}{In Practice: CodeQL}
+\begin{frame}[fragile]{Let's Go On A Little Adventure}
+	\begin{itemize}
+		\item Next.js, the most popular React framework, has some weird, poorly documented
+		      URL parsing semantics that does not conform to the widely accepted WHATWG URL
+		      standard
+		\item This is unexpected behaviour, and often results in wrong URL validation
+		\item Made a responsible disclosure $\approx 1$ year ago, still not fixed \end{itemize}
+	\bigskip
+	Let's query open-source GitHub projects to find instances of this bug!
+	\bigskip
+	\begin{itemize}
+		\item Common design pattern: unauthenticated user visits \verb|/admin|, gets
+		      redirected to \verb|/login?next=/admin|, logs in, and gets redirected back to
+		      \verb|/admin|
+		\item Use Next.js URL parsing trickery to turn a ``normal'' URL into
+		      \verb|javascript:sendToAttacker(authToken)| at the final step
+	\end{itemize}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+\begin{frame}{Taint Tracking in CodeQL}
 	We want to find all instances where untrusted user input (source) reaches a
 	sensitive function (sink) without being sanitized.
 
 	\begin{figure}
-		\includegraphics[width=\textwidth]{img/3.png}
+		\includegraphics[height=0.7\textheight]{img/3.png}
 	\end{figure}
 \end{frame}
 
@@ -601,7 +622,9 @@
 	\end{figure}
 
 	You can also extend this with custom logic, to incorporate codebase-specific
-	patterns -- e.g. RPC calls, deserialization, etc.
+	patterns
+
+	e.g. RPC calls, deserialization, etc.
 
 \end{frame}
 
@@ -609,8 +632,14 @@
 \begin{frame}{Defining Sinks}
 
 	\begin{figure}
-		\includegraphics[height=0.8\textheight]{img/5.png}
+		\includegraphics[width=\textwidth]{img/5.png}
 	\end{figure}
+	\vspace{-1em}
+	\begin{align*}
+		\text{isSink}(\text{node}) \triangleq \  & \exists \ \text{call}, \text{receiver} \ .\   \text{call invokes the {\bf.push} method on receiver} \ \land                           \\
+		                                         & \exists \ \text{invocation} \ .\   \text{invocation is {\bf useRouter()}} \land \text{invocation} \rightarrow^* \text{receiver} \land \\ \
+		                                         & \text{node} = \text{{\bf args}(call)[0]}
+	\end{align*}
 \end{frame}
 
 %----------------------------------------------------------------------------------------
@@ -633,7 +662,31 @@
 \end{frame}
 
 %----------------------------------------------------------------------------------------
+\begin{frame}{Let's Go Hunting}
+
+	\begin{figure}
+		\includegraphics[width=\textwidth]{img/8.png}
+	\end{figure}
+
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+\begin{frame}{Let's Go Hunting}
+	\note{Begin demo here. Show the variant analysis results on VSCode, and show the demo exploit.}
+	\begin{figure}
+		\includegraphics[width=\textwidth]{img/9.png}
+	\end{figure}
+
+\end{frame}
+
+%----------------------------------------------------------------------------------------
 \begin{frame}{Limitations}
+
+	CodeQL is very useful as a CI integration to catch security issues early in the
+	development process, and provide guarantees about your code. But it's really
+	hard to get right \dots
+
+	\bigskip
 
 	\begin{itemize}
 		\item We need to create custom taint specifications for third-party library APIs.
