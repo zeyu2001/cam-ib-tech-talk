@@ -354,6 +354,7 @@
 %------------------------------------------------
 
 \begin{frame}{Data Flow Analysis}
+	\note{Why constant propagation - replace variable with constant value, so don't have to look up variable value at runtime.}
 	Main idea: we want to {\bf find the possible values of variables at each point in the program.}
 
 	\bigskip
@@ -637,9 +638,9 @@
 	\end{figure}
 	\vspace{-1em}
 	\begin{align*}
-		\text{isSink}(\text{node}) \triangleq \  & \exists \ \text{call}, \text{receiver} \ .\   \text{call invokes the {\bf.push} method on receiver} \ \land                           \\
-		                                         & \exists \ \text{invocation} \ .\   \text{invocation is {\bf useRouter()}} \land \text{invocation} \rightarrow^* \text{receiver} \land \\ \
-		                                         & \text{node} = \text{{\bf args}(call)[0]}
+		\text{isSink}(\text{node}) \triangleq \  & \exists \ \text{call}, \text{receiver} \ .\   \text{call invokes the {\bf.push} method on receiver} \ \land                             \\
+		                                         & \exists \ \text{invocation} \ .\   \text{invocation is {\bf useRouter()}} \land \text{invocation} \rightarrow^* \text{receiver} \ \land \\
+		\                                        & \text{node} = \text{{\bf args}(call)[0]}
 	\end{align*}
 \end{frame}
 
